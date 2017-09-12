@@ -14,10 +14,10 @@ import android.widget.Toast;
 import com.dzt.btcommunication.adapter.FragmentAdapter;
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
-	enum ServerOrCilent {
+	enum ServerOrClient {
 		NONE,
 		SERVICE,
-		CILENT
+		CLIENT
 	}
 
 	private static final String TAG = "MainActivity";
@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 	private Toolbar toolbar;
 	private ViewPager viewPager;
 	static String BlueToothAddress = "null";
-	static ServerOrCilent serviceOrCilent = ServerOrCilent.NONE;
+	static ServerOrClient serviceOrClient = ServerOrClient.NONE;
 	static boolean isOpen = false;
 	private DeviceFragment deviceFragment;
 	private ChatFragment chatFragment;
@@ -78,8 +78,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 				Toast.makeText(this, "连接已经打开，可以通信。如果要再建立连接，请先断开！", Toast.LENGTH_SHORT).show();
 				return;
 			}
-			if (serviceOrCilent == ServerOrCilent.CILENT) {
-				Log.i(TAG, "---------------------onResume CILENT");
+			if (serviceOrClient == ServerOrClient.CLIENT) {
+				Log.i(TAG, "---------------------onResume CLIENT");
 				String address = BlueToothAddress;
 				if (!address.equals("null")) {
 					chatFragment.startClientThread(address);
@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 				} else {
 					Toast.makeText(this, "address is null !", Toast.LENGTH_SHORT).show();
 				}
-			} else if (serviceOrCilent == ServerOrCilent.SERVICE) {
+			} else if (serviceOrClient == ServerOrClient.SERVICE) {
 				chatFragment.startServerThread();
 				isOpen = true;
 			}

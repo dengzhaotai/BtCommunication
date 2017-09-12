@@ -50,12 +50,12 @@ public class ChatFragment extends Fragment implements AdapterView.OnItemClickLis
 	public static final String PROTOCOL_SCHEME_BT_OBEX = "btgoep";
 	public static final String PROTOCOL_SCHEME_TCP_OBEX = "tcpobex";
 
-	private BluetoothServerSocket mserverSocket = null;
+	private BluetoothServerSocket serverSocket = null;
 	private ServerThread startServerThread = null;
 	private clientThread clientConnectThread = null;
 	private BluetoothSocket socket = null;
 	private BluetoothDevice device = null;
-	private readThread mreadThread = null;
+	private readThread readThread = null;
 	private BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
 	@Override
@@ -112,13 +112,13 @@ public class ChatFragment extends Fragment implements AdapterView.OnItemClickLis
 					Toast.makeText(getActivity(), "发送内容不能为空！", Toast.LENGTH_SHORT).show();
 				break;
 			case R.id.btn_disconnect:
-				if (MainActivity.serviceOrCilent == MainActivity.ServerOrCilent.CILENT) {
+				if (MainActivity.serviceOrClient == MainActivity.ServerOrClient.CLIENT) {
 					shutdownClient();
-				} else if (MainActivity.serviceOrCilent == MainActivity.ServerOrCilent.SERVICE) {
+				} else if (MainActivity.serviceOrClient == MainActivity.ServerOrClient.SERVICE) {
 					shutdownServer();
 				}
 				MainActivity.isOpen = false;
-				MainActivity.serviceOrCilent = MainActivity.ServerOrCilent.NONE;
+				MainActivity.serviceOrClient = MainActivity.ServerOrClient.NONE;
 				Toast.makeText(getActivity(), "已断开连接！", Toast.LENGTH_SHORT).show();
 				break;
 			default:
@@ -131,13 +131,13 @@ public class ChatFragment extends Fragment implements AdapterView.OnItemClickLis
 
 	}
 
-	public void startClientThread(String address){
+	public void startClientThread(String address) {
 		device = mBluetoothAdapter.getRemoteDevice(address);
 		clientConnectThread = new clientThread();
 		clientConnectThread.start();
 	}
 
-	public void startServerThread(){
+	public void startServerThread() {
 		startServerThread = new ServerThread();
 		startServerThread.start();
 	}
@@ -162,8 +162,8 @@ public class ChatFragment extends Fragment implements AdapterView.OnItemClickLis
 				msg.what = 0;
 				LinkDetectedHandler.sendMessage(msg);
 				//启动接受数据
-				mreadThread = new readThread();
-				mreadThread.start();
+				readThread = new readThread();
+				readThread.start();
 			} catch (IOException e) {
 				Log.e("connect", "", e);
 				Message msg = new Message();
@@ -180,7 +180,7 @@ public class ChatFragment extends Fragment implements AdapterView.OnItemClickLis
 			try {
 				/* 创建一个蓝牙服务器
 				 * 参数分别：服务器名称、UUID	 */
-				mserverSocket = mBluetoothAdapter.listenUsingRfcommWithServiceRecord(PROTOCOL_SCHEME_RFCOMM,
+				serverSocket = mBluetoothAdapter.listenUsingRfcommWithServiceRecord(PROTOCOL_SCHEME_RFCOMM,
 						UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
 
 				Log.d("server", "wait cilent connect...");
@@ -191,7 +191,7 @@ public class ChatFragment extends Fragment implements AdapterView.OnItemClickLis
 				LinkDetectedHandler.sendMessage(msg);
 
 				/* 接受客户端的连接请求 */
-				socket = mserverSocket.accept();
+				socket = serverSocket.accept();
 				Log.d("server", "accept success !");
 
 				Message msg2 = new Message();
@@ -200,8 +200,8 @@ public class ChatFragment extends Fragment implements AdapterView.OnItemClickLis
 				msg.what = 0;
 				LinkDetectedHandler.sendMessage(msg2);
 				//启动接受数据
-				mreadThread = new readThread();
-				mreadThread.start();
+				readThread = new readThread();
+				readThread.start();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -216,18 +216,18 @@ public class ChatFragment extends Fragment implements AdapterView.OnItemClickLis
 					startServerThread.interrupt();
 					startServerThread = null;
 				}
-				if (mreadThread != null) {
-					mreadThread.interrupt();
-					mreadThread = null;
+				if (readThread != null) {
+					readThread.interrupt();
+					readThread = null;
 				}
 				try {
 					if (socket != null) {
 						socket.close();
 						socket = null;
 					}
-					if (mserverSocket != null) {
-						mserverSocket.close();/* 关闭服务器 */
-						mserverSocket = null;
+					if (serverSocket != null) {
+						serverSocket.close();/* 关闭服务器 */
+						serverSocket = null;
 					}
 				} catch (IOException e) {
 					Log.e("server", "mserverSocket.close()", e);
@@ -244,9 +244,9 @@ public class ChatFragment extends Fragment implements AdapterView.OnItemClickLis
 					clientConnectThread.interrupt();
 					clientConnectThread = null;
 				}
-				if (mreadThread != null) {
-					mreadThread.interrupt();
-					mreadThread = null;
+				if (readThread != null) {
+					readThread.interrupt();
+					readThread = null;
 				}
 				if (socket != null) {
 					try {
@@ -319,12 +319,12 @@ public class ChatFragment extends Fragment implements AdapterView.OnItemClickLis
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
-		if (MainActivity.serviceOrCilent == MainActivity.ServerOrCilent.CILENT) {
+		if (MainActivity.serviceOrClient == MainActivity.ServerOrClient.CLIENT) {
 			shutdownClient();
-		} else if (MainActivity.serviceOrCilent == MainActivity.ServerOrCilent.SERVICE) {
+		} else if (MainActivity.serviceOrClient == MainActivity.ServerOrClient.SERVICE) {
 			shutdownServer();
 		}
 		MainActivity.isOpen = false;
-		MainActivity.serviceOrCilent = MainActivity.ServerOrCilent.NONE;
+		MainActivity.serviceOrClient = MainActivity.ServerOrClient.NONE;
 	}
 }

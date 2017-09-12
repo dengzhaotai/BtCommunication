@@ -83,7 +83,7 @@ public class DeviceFragment extends Fragment {
 		serviceButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				MainActivity.serviceOrCilent = MainActivity.ServerOrCilent.SERVICE;
+				MainActivity.serviceOrClient = MainActivity.ServerOrClient.SERVICE;
 				MainActivity activity = (MainActivity) getActivity();
 				activity.setCurrentTab(1);
 			}
@@ -137,7 +137,7 @@ public class DeviceFragment extends Fragment {
 					mBtAdapter.cancelDiscovery();
 					seachButton.setText("重新搜索");
 
-					MainActivity.serviceOrCilent = MainActivity.ServerOrCilent.CILENT;
+					MainActivity.serviceOrClient = MainActivity.ServerOrClient.CLIENT;
 					MainActivity activity = (MainActivity) getActivity();
 					activity.setCurrentTab(1);
 				}
