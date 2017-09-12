@@ -6,6 +6,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -81,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 			if (serviceOrClient == ServerOrClient.CLIENT) {
 				Log.i(TAG, "---------------------onResume CLIENT");
 				String address = BlueToothAddress;
-				if (!address.equals("null")) {
+				if (!TextUtils.isEmpty(address)) {
 					chatFragment.startClientThread(address);
 					isOpen = true;
 				} else {
